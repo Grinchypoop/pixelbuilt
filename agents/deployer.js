@@ -143,7 +143,7 @@ async function pollDeployment(deploymentId, token, emit) {
   throw new Error('Deployment timed out after 5 minutes');
 }
 
-export async function deployerAgent(workDir, sessionId, emit) {
+export async function deployerAgent(workDir, sessionId, subdomain, emit) {
   emit({ type: 'agent_start', agent: 'deployer' });
 
   const vercelToken = process.env.VERCEL_TOKEN;
@@ -198,7 +198,27 @@ export async function deployerAgent(workDir, sessionId, emit) {
 
     const deployUrl = await pollDeployment(deployData.id, vercelToken, emit);
     emit({ type: 'agent_log', agent: 'deployer', text: `Deployed successfully: ${deployUrl}\n` });
-    emit({ type: 'pipeline_complete', deployUrl });
+
+    // Add custom domain alias if subdomain was provided
+    let finalUrl = deployUrl;
+    if (subdomain) {
+      const alias = `${subdomain}.stackplus.sg`;
+      emit({ type: 'agent_log', agent: 'deployer', text: `Adding custom domain: ${alias}\n` });
+      const aliasRes = await fetch(`${VERCEL_API}/v2/deployments/${deployData.id}/aliases`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${vercelToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ alias }),
+      });
+      if (aliasRes.ok) {
+        finalUrl = `https://${alias}`;
+        emit({ type: 'agent_log', agent: 'deployer', text: `Custom domain set: ${finalUrl}\n` });
+      } else {
+        const aliasErr = await aliasRes.text();
+        emit({ type: 'agent_log', agent: 'deployer', text: `Custom domain failed (using Vercel URL): ${aliasErr}\n` });
+      }
+    }
+
+    emit({ type: 'pipeline_complete', deployUrl: finalUrl });
 
     return { success: true, deployUrl };
   } catch (err) {

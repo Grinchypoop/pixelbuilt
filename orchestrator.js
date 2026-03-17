@@ -65,6 +65,10 @@ export async function runPipeline(plan, sessionId, emit) {
     }
   }
 
+  // Extract subdomain from plan
+  const subdomainMatch = plan.match(/<subdomain>([\w-]+)<\/subdomain>/i);
+  const subdomain = subdomainMatch ? subdomainMatch[1].toLowerCase() : null;
+
   // Deploy
-  await deployerAgent(workDir, sessionId, emit);
+  await deployerAgent(workDir, sessionId, subdomain, emit);
 }

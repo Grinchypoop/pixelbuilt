@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pixel</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -154,6 +155,11 @@
     .msg.agent .msg-bubble { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 3px; }
     .msg-bubble.error { background: #fef2f2; border-color: #fecaca; color: var(--red); }
     .msg-bubble.success { background: #f0fdf4; border-color: #bbf7d0; color: var(--green); }
+    .msg-bubble ul, .msg-bubble ol { padding-left: 18px; margin: 6px 0; }
+    .msg-bubble li { margin: 3px 0; }
+    .msg-bubble p { margin: 4px 0; }
+    .msg-bubble strong { font-weight: 600; }
+    .msg-bubble h1, .msg-bubble h2, .msg-bubble h3 { font-size: 14px; font-weight: 700; margin: 8px 0 4px; }
 
     /* Typing */
     .typing-wrap { display: flex; gap: 5px; padding: 12px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); border-bottom-left-radius: 3px; width: fit-content; }
@@ -455,7 +461,11 @@
     lbl.textContent = role === 'user' ? 'You' : 'Pixel';
     const b = document.createElement('div');
     b.className = `msg-bubble ${cls}`;
-    b.textContent = text;
+    if (role === 'agent') {
+      b.innerHTML = marked.parse(text);
+    } else {
+      b.textContent = text;
+    }
     w.append(lbl, b);
     messagesEl.appendChild(w);
     messagesEl.scrollTop = messagesEl.scrollHeight;
