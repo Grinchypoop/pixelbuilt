@@ -15,20 +15,12 @@ const SYSTEM_PROMPT = `You are Pixel's coding agent. You will receive a plan for
 
 Start by creating: package.json (with next, react, react-dom, tailwindcss), tailwind.config.js, next.config.js, app/layout.tsx, app/page.tsx, and any other needed pages/components. Make the app fully functional and beautiful. Use Tailwind for all styling.
 
-IMPORTANT: Always include this in next.config.js to allow the app to be embedded in iframes:
+IMPORTANT: Always use this exact next.config.js for every app:
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          { key: 'X-Frame-Options', value: 'ALLOWALL' },
-          { key: 'Content-Security-Policy', value: "frame-ancestors *" },
-        ],
-      },
-    ];
-  },
+  output: 'export',
+  trailingSlash: true,
+  images: { unoptimized: true },
 };
 module.exports = nextConfig;`;
 

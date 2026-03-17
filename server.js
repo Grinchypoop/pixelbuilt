@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { EventEmitter } from 'events';
 import { plannerChat } from './agents/planner.js';
 import { runPipeline } from './orchestrator.js';
+import { deployerAgent } from './agents/deployer.js';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -19,10 +20,35 @@ const wss = new WebSocketServer({ server, path: '/ws' });
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
 
 // In-memory session store
 const sessions = new Map();
+
+let currentPreview = null; // { outDir: string }
+
+// Serve Next.js static assets for preview (must be before other routes)
+app.use('/_next', (req, res, next) => {
+  if (!currentPreview) return next();
+  const assetPath = path.join(currentPreview.outDir, '_next', req.path);
+  res.sendFile(assetPath, (err) => { if (err) next(); });
+});
+
+// Serve preview app
+app.use('/preview', (req, res, next) => {
+  if (!currentPreview) return res.status(404).send('No preview available');
+  const reqPath = req.path === '/' ? '/index.html' : req.path;
+  const filePath = path.join(currentPreview.outDir, reqPath);
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      // Try index.html for SPA routing
+      res.sendFile(path.join(currentPreview.outDir, 'index.html'), (err2) => {
+        if (err2) next();
+      });
+    }
+  });
+});
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 // POST /api/chat
 app.post('/api/chat', async (req, res) => {
@@ -59,13 +85,20 @@ app.post('/api/build', (req, res) => {
     events: [],
     emitter,
     deployUrl: null,
+    workDir: null,
+    subdomain: null,
   };
   sessions.set(sessionId, session);
 
   const emit = (event) => {
     session.events.push(event);
     emitter.emit('event', event);
-    if (event.type === 'pipeline_complete') {
+    if (event.type === 'build_complete') {
+      session.status = 'built';
+      session.workDir = event.workDir;
+      session.subdomain = event.subdomain;
+      currentPreview = { outDir: path.join(event.workDir, 'out') };
+    } else if (event.type === 'pipeline_complete') {
       session.status = 'complete';
       session.deployUrl = event.deployUrl;
     } else if (event.type === 'pipeline_error') {
@@ -80,6 +113,30 @@ app.post('/api/build', (req, res) => {
   });
 
   res.json({ sessionId });
+});
+
+// POST /api/deploy/:sessionId
+app.post('/api/deploy/:sessionId', async (req, res) => {
+  const session = sessions.get(req.params.sessionId);
+  if (!session || !session.workDir) {
+    return res.status(404).json({ error: 'Session not found or not built yet' });
+  }
+  res.json({ ok: true });
+
+  const deployEmit = (event) => {
+    session.events.push(event);
+    session.emitter.emit('event', event);
+    if (event.type === 'pipeline_complete') {
+      session.status = 'complete';
+      session.deployUrl = event.deployUrl;
+    } else if (event.type === 'pipeline_error') {
+      session.status = 'error';
+    }
+  };
+
+  deployerAgent(session.workDir, req.params.sessionId, session.subdomain, deployEmit).catch((err) => {
+    deployEmit({ type: 'pipeline_error', error: err.message });
+  });
 });
 
 // GET /api/session/:sessionId

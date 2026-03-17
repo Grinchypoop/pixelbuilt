@@ -659,20 +659,31 @@
         if (ev.success) addMsg('agent', `✅ ${cap(ev.agent)} finished`);
         else addMsg('agent', `⚠️ ${cap(ev.agent)} hit issues — running debugger...`);
         break;
-      case 'pipeline_complete':
-        deployUrl = ev.deployUrl;
+      case 'build_complete':
         isBuilding = false;
         setStatus('', false);
-        showIframe(deployUrl);
-        publishBtn.href = deployUrl;
+        showIframe('/preview/');
+        publishBtn.textContent = '';
+        publishBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Deploy`;
         publishBtn.style.display = 'flex';
-        addMsgHTML('agent',
-          `🎉 Your app is live! <a href="${deployUrl}" target="_blank" style="color:var(--accent);text-decoration:underline">${deployUrl}</a>`,
-          'success'
-        );
+        publishBtn.onclick = () => triggerDeploy();
+        publishBtn.href = '#';
         sendBtn.disabled = false;
         inputEl.placeholder = 'Ask Pixel to modify your app...';
         inputEl.focus();
+        addMsg('agent', '✅ Your app is ready for preview! Make any changes or click Deploy when satisfied.');
+        break;
+      case 'pipeline_complete':
+        deployUrl = ev.deployUrl;
+        setStatus('', false);
+        showIframe(deployUrl);
+        publishBtn.href = deployUrl;
+        publishBtn.onclick = null;
+        publishBtn.disabled = false;
+        publishBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg> Open App`;
+        publishBtn.style.display = 'flex';
+        publishBtn.target = '_blank';
+        addMsgHTML('agent', `🎉 Your app is live! <a href="${ev.deployUrl}" target="_blank" style="color:var(--accent);text-decoration:underline">${ev.deployUrl}</a>`, 'success');
         break;
       case 'pipeline_error':
         isBuilding = false;
@@ -682,6 +693,21 @@
         sendBtn.disabled = false;
         inputEl.focus();
         break;
+    }
+  }
+
+  async function triggerDeploy() {
+    if (!sessionId) return;
+    publishBtn.disabled = true;
+    publishBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg> Deploying...`;
+    setStatus('Deploying to Vercel...', true);
+    addMsg('agent', '🚀 Deploying your app...');
+    try {
+      const res = await fetch(`${API_BASE}/api/deploy/${sessionId}`, { method: 'POST' });
+      if (!res.ok) throw new Error('Deploy failed to start');
+    } catch (err) {
+      addMsg('agent', `Deploy failed: ${err.message}`, 'error');
+      publishBtn.disabled = false;
     }
   }
 
