@@ -155,11 +155,13 @@
     .msg.agent .msg-bubble { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 3px; }
     .msg-bubble.error { background: #fef2f2; border-color: #fecaca; color: var(--red); }
     .msg-bubble.success { background: #f0fdf4; border-color: #bbf7d0; color: var(--green); }
-    .msg-bubble ul, .msg-bubble ol { padding-left: 18px; margin: 6px 0; }
-    .msg-bubble li { margin: 3px 0; }
-    .msg-bubble p { margin: 4px 0; }
+    .msg-bubble ul, .msg-bubble ol { padding-left: 18px; margin: 10px 0; }
+    .msg-bubble li { margin: 7px 0; line-height: 1.6; }
+    .msg-bubble p { margin: 8px 0; line-height: 1.65; }
+    .msg-bubble p:first-child { margin-top: 0; }
+    .msg-bubble p:last-child { margin-bottom: 0; }
     .msg-bubble strong { font-weight: 600; }
-    .msg-bubble h1, .msg-bubble h2, .msg-bubble h3 { font-size: 14px; font-weight: 700; margin: 8px 0 4px; }
+    .msg-bubble h1, .msg-bubble h2, .msg-bubble h3 { font-size: 14px; font-weight: 700; margin: 12px 0 6px; }
 
     /* Typing */
     .typing-wrap { display: flex; gap: 5px; padding: 12px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); border-bottom-left-radius: 3px; width: fit-content; }
