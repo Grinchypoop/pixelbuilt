@@ -102,11 +102,49 @@
     /* ══ LAYOUT ══ */
     #app { display: flex; height: 100vh; overflow: hidden; }
 
+    /* ══ PLANNING MODE — full-width chat ══ */
+    #app.planning { justify-content: center; }
+    #app.planning #chat-panel {
+      width: 100%; max-width: 720px; border-right: none;
+      box-shadow: none;
+    }
+    #app.planning #preview-panel { display: none; }
+
     /* ══ LEFT: CHAT ══ */
     #chat-panel {
       width: 420px; flex-shrink: 0;
       background: var(--surface); border-right: 1px solid var(--border);
       display: flex; flex-direction: column;
+      transition: width 0.6s cubic-bezier(0.4,0,0.2,1), max-width 0.6s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    /* ══ ARCHITECTURE CARD ══ */
+    .arch-card {
+      margin-top: 10px;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .arch-card-header {
+      background: var(--accent-glow);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 14px;
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--accent);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .arch-card-body {
+      padding: 14px;
+      font-size: 13px; color: var(--text); line-height: 1.65;
+    }
+    .arch-card-body ul { padding-left: 16px; margin: 6px 0; }
+    .arch-card-body li { margin: 4px 0; }
+    .arch-card-body p { margin: 6px 0; }
+    .arch-card-body strong { font-weight: 600; color: var(--accent); }
+    .arch-card-body h1,.arch-card-body h2,.arch-card-body h3 {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text2); margin: 12px 0 4px;
     }
     #chat-header {
       height: 52px; padding: 0 18px;
@@ -265,7 +303,7 @@
   </style>
 </head>
 <body>
-<div id="app">
+<div id="app" class="planning">
 
   <!-- ── LEFT PANEL ── -->
   <div id="chat-panel">
@@ -571,9 +609,13 @@
       history.push({ role: 'assistant', content: data.response });
 
       if (data.ready) {
-        const planText = data.response.replace(/READY_TO_BUILD/g, '').trim();
-        addMsg('agent', planText.length > 400 ? planText.slice(0, 400) + '…' : planText);
-        setTimeout(() => startBuild(data.response), 400);
+        const fullText = data.response.replace(/READY_TO_BUILD/g, '').trim();
+        // Extract plan content for architecture card
+        const planMatch = fullText.match(/<plan>([\s\S]*?)<\/plan>/i);
+        const chatText = fullText.replace(/<plan>[\s\S]*?<\/plan>/gi, '').trim();
+        if (chatText) addMsg('agent', chatText);
+        if (planMatch) showArchCard(planMatch[1].trim());
+        setTimeout(() => startBuild(data.response), 600);
       } else {
         addMsg('agent', data.response);
         sendBtn.disabled = false;
@@ -591,10 +633,12 @@
   // ── Start build ──
   async function startBuild(plan) {
     isBuilding = true;
+    // Transition from planning (full-width) to split layout
+    document.getElementById('app').classList.remove('planning');
     showSkeleton();
     setStatus('Starting build pipeline...');
     buildLog.style.display = 'block';
-    addMsg('agent', '🚀 Build pipeline started! I\'ll keep you updated as your app is created and deployed.');
+    addMsg('agent', '🚀 Build pipeline started! I\'ll keep you updated as your app is created.');
 
     try {
       const res = await fetch(`${API_BASE}/api/build`, {
@@ -709,6 +753,27 @@
       addMsg('agent', `Deploy failed: ${err.message}`, 'error');
       publishBtn.disabled = false;
     }
+  }
+
+  function showArchCard(planContent) {
+    hideWelcome();
+    const w = document.createElement('div');
+    w.className = 'msg agent';
+    const lbl = document.createElement('div');
+    lbl.className = 'msg-label';
+    lbl.textContent = 'Pixel';
+    const card = document.createElement('div');
+    card.className = 'arch-card';
+    card.innerHTML = `
+      <div class="arch-card-header">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        System Architecture
+      </div>
+      <div class="arch-card-body">${marked.parse(planContent)}</div>
+    `;
+    w.append(lbl, card);
+    messagesEl.appendChild(w);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
   function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
