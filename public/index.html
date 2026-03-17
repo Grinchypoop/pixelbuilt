@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pixel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #faf8f5;
+      --surface: #ffffff;
+      --surface2: #f3f0fa;
+      --border: #ede9f8;
+      --text: #1a1035;
+      --text2: #7c6fa0;
+      --text3: #b8aed4;
+      --accent: #7c3aed;
+      --accent2: #9d60f8;
+      --accent-glow: rgba(124,58,237,0.12);
+      --green: #16a34a;
+      --red: #dc2626;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --transition: 0.18s cubic-bezier(0.4,0,0.2,1);
+    }
+    html, body { height: 100%; overflow: hidden; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; }
+
+    /* ══ GHOST (Uiverse by BlackisPlay) ══ */
+    .css-ghost { position: relative; scale: 0.8; display: inline-block; }
+
+    .ghost-red {
+      animation: upNDown infinite 0.5s;
+      position: relative; width: 140px; height: 140px;
+      display: grid;
+      grid-template-columns: repeat(14, 1fr);
+      grid-template-rows: repeat(14, 1fr);
+      grid-column-gap: 0px; grid-row-gap: 0px;
+      grid-template-areas:
+        "a1  a2  a3  a4  a5  top0  top0  top0  top0  a10 a11 a12 a13 a14"
+        "b1  b2  b3  top1 top1 top1 top1 top1 top1 top1 top1 b12 b13 b14"
+        "c1 c2 top2 top2 top2 top2 top2 top2 top2 top2 top2 top2 c13 c14"
+        "d1 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 d14"
+        "e1 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 e14"
+        "f1 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 top3 f14"
+        "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+        "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+        "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+        "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+        "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+        "top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4 top4"
+        "st0 st0 an4 st1 an7 st2 an10 an10 st3 an13 st4 an16 st5 st5"
+        "an1 an2 an3 an5 an6 an8 an9 an9 an11 an12 an14 an15 an17 an18";
+    }
+    @keyframes upNDown { 0%,49%{ transform:translateY(0px) } 50%,100%{ transform:translateY(-10px) } }
+
+    .g-top0,.g-top1,.g-top2,.g-top3,.g-top4,
+    .g-st0,.g-st1,.g-st2,.g-st3,.g-st4,.g-st5 { background-color: var(--accent); }
+    .g-top0 { grid-area: top0; } .g-top1 { grid-area: top1; } .g-top2 { grid-area: top2; }
+    .g-top3 { grid-area: top3; } .g-top4 { grid-area: top4; }
+    .g-st0 { grid-area: st0; } .g-st1 { grid-area: st1; } .g-st2 { grid-area: st2; }
+    .g-st3 { grid-area: st3; } .g-st4 { grid-area: st4; } .g-st5 { grid-area: st5; }
+
+    .g-an1  { grid-area: an1;  animation: flicker0 infinite 0.5s; }
+    .g-an18 { grid-area: an18; animation: flicker0 infinite 0.5s; }
+    .g-an2  { grid-area: an2;  animation: flicker1 infinite 0.5s; }
+    .g-an17 { grid-area: an17; animation: flicker1 infinite 0.5s; }
+    .g-an3  { grid-area: an3;  animation: flicker1 infinite 0.5s; }
+    .g-an16 { grid-area: an16; animation: flicker1 infinite 0.5s; }
+    .g-an4  { grid-area: an4;  animation: flicker1 infinite 0.5s; }
+    .g-an15 { grid-area: an15; animation: flicker1 infinite 0.5s; }
+    .g-an5  { grid-area: an5; }
+    .g-an6  { grid-area: an6;  animation: flicker0 infinite 0.5s; }
+    .g-an12 { grid-area: an12; animation: flicker0 infinite 0.5s; }
+    .g-an7  { grid-area: an7;  animation: flicker0 infinite 0.5s; }
+    .g-an13 { grid-area: an13; animation: flicker0 infinite 0.5s; }
+    .g-an8  { grid-area: an8;  animation: flicker0 infinite 0.5s; }
+    .g-an11 { grid-area: an11; animation: flicker0 infinite 0.5s; }
+    .g-an9  { grid-area: an9;  animation: flicker1 infinite 0.5s; }
+    .g-an10 { grid-area: an10; animation: flicker1 infinite 0.5s; }
+    .g-an14 { grid-area: an14; }
+
+    @keyframes flicker0 { 0%,49%{ background-color:var(--accent) } 50%,100%{ background-color:transparent } }
+    @keyframes flicker1 { 0%,49%{ background-color:transparent } 50%,100%{ background-color:var(--accent) } }
+
+    .g-eye  { width:40px; height:50px; position:absolute; top:30px; left:10px; }
+    .g-eye1 { width:40px; height:50px; position:absolute; top:30px; right:30px; }
+    .g-eye::before,.g-eye1::before { content:""; background-color:white; width:20px; height:50px; transform:translateX(10px); display:block; position:absolute; }
+    .g-eye::after,.g-eye1::after   { content:""; background-color:white; width:40px; height:30px; transform:translateY(10px); display:block; position:absolute; }
+    .g-pupil  { width:20px; height:20px; background-color:blue; position:absolute; top:50px; left:10px;  z-index:1; animation:eyesMovement infinite 3s; }
+    .g-pupil1 { width:20px; height:20px; background-color:blue; position:absolute; top:50px; right:50px; z-index:1; animation:eyesMovement infinite 3s; }
+    @keyframes eyesMovement { 0%,49%{transform:translateX(0px)} 50%,99%{transform:translateX(10px)} 100%{transform:translateX(0px)} }
+    .g-shadow { background-color:black; width:140px; height:140px; position:absolute; border-radius:50%; transform:rotateX(80deg); filter:blur(20px); top:80%; animation:shadowMovement infinite 0.5s; }
+    @keyframes shadowMovement { 0%,49%{opacity:0.5} 50%,100%{opacity:0.2} }
+
+    /* Logo ghost */
+    .logo-ghost-wrap { width:24px; height:24px; overflow:hidden; position:relative; flex-shrink:0; }
+    .logo-ghost-wrap .css-ghost { scale:1; transform:scale(0.17); transform-origin:top left; position:absolute; top:0; left:0; }
+
+    /* ══ LAYOUT ══ */
+    #app { display: flex; height: 100vh; overflow: hidden; }
+
+    /* ══ LEFT: CHAT ══ */
+    #chat-panel {
+      width: 420px; flex-shrink: 0;
+      background: var(--surface); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+    }
+    #chat-header {
+      height: 52px; padding: 0 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    }
+    .logo-text { font-size: 17px; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; }
+    .logo-badge {
+      margin-left: auto; font-size: 10px; font-weight: 600; letter-spacing: .06em;
+      text-transform: uppercase; color: var(--accent);
+      background: var(--accent-glow); border: 1px solid rgba(124,58,237,.25);
+      padding: 2px 8px; border-radius: 100px;
+    }
+
+    #messages {
+      flex: 1; overflow-y: auto; padding: 16px 16px 8px;
+      display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth;
+    }
+    #messages::-webkit-scrollbar { width: 4px; }
+    #messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Welcome */
+    #welcome {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; flex: 1; text-align: center; gap: 14px; padding: 32px 16px;
+    }
+    #ghost-wrap { display: flex; flex-direction: column; align-items: center; padding-bottom: 20px; }
+    #welcome h2 { font-size: 19px; font-weight: 700; color: var(--text); }
+    #welcome p { font-size: 13.5px; color: var(--text2); max-width: 260px; line-height: 1.65; }
+    .chips { display: flex; flex-wrap: wrap; gap: 7px; justify-content: center; margin-top: 4px; }
+    .chip {
+      font-size: 12px; padding: 5px 12px; border-radius: 100px;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text2); cursor: pointer; transition: all var(--transition);
+    }
+    .chip:hover { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
+
+    /* Messages */
+    .msg { display: flex; flex-direction: column; max-width: 90%; animation: msgIn .2s ease; }
+    @keyframes msgIn { from { opacity:0; transform:translateY(5px) } to { opacity:1; transform:none } }
+    .msg.user { align-self: flex-end; align-items: flex-end; }
+    .msg.agent { align-self: flex-start; align-items: flex-start; }
+    .msg-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing:.06em; color: var(--text3); margin-bottom: 3px; padding: 0 3px; }
+    .msg-bubble { padding: 10px 14px; border-radius: var(--radius); font-size: 13.5px; line-height: 1.6; word-break: break-word; }
+    .msg.user .msg-bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 3px; }
+    .msg.agent .msg-bubble { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 3px; }
+    .msg-bubble.error { background: #fef2f2; border-color: #fecaca; color: var(--red); }
+    .msg-bubble.success { background: #f0fdf4; border-color: #bbf7d0; color: var(--green); }
+
+    /* Typing */
+    .typing-wrap { display: flex; gap: 5px; padding: 12px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); border-bottom-left-radius: 3px; width: fit-content; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); animation: bounce 1.2s ease-in-out infinite; }
+    .dot:nth-child(2) { animation-delay: .15s; }
+    .dot:nth-child(3) { animation-delay: .3s; }
+    @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
+
+    /* File pills */
+    #file-pills { padding: 0 16px 6px; display: flex; flex-wrap: wrap; gap: 5px; }
+    .pill {
+      font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 100px;
+      background: var(--accent-glow); border: 1px solid rgba(124,58,237,.2); color: var(--accent);
+      animation: popIn .15s ease;
+    }
+    @keyframes popIn { from{opacity:0;transform:scale(.8)} to{opacity:1;transform:none} }
+
+    /* Build log */
+    #build-log {
+      margin: 0 16px 6px; background: #faf8ff; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); padding: 10px 12px;
+      max-height: 110px; overflow-y: auto; display: none;
+    }
+    #build-log pre { font-family: 'SF Mono','Fira Code',monospace; font-size: 11px; color: var(--accent); white-space: pre-wrap; word-break: break-all; }
+
+    /* Status */
+    #status-bar {
+      display: none; align-items: center; gap: 8px;
+      padding: 7px 14px; margin: 0 16px 6px;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 12px; color: var(--text2);
+    }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex-shrink: 0; animation: pulse 1.4s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.75)} }
+
+    /* Input */
+    #input-area { padding: 12px 16px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+    #input-box {
+      display: flex; gap: 8px; align-items: flex-end;
+      background: var(--surface2); border: 1.5px solid var(--border);
+      border-radius: var(--radius); padding: 9px 12px;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    #input-box:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    #msg-input {
+      flex: 1; background: none; border: none; outline: none;
+      color: var(--text); font-family: inherit; font-size: 13.5px; line-height: 1.5;
+      resize: none; max-height: 130px; min-height: 20px;
+    }
+    #msg-input::placeholder { color: var(--text3); }
+    #send-btn {
+      flex-shrink: 0; width: 32px; height: 32px; border-radius: var(--radius-sm);
+      background: var(--accent); border: none; cursor: pointer; color: white;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition);
+    }
+    #send-btn:hover:not(:disabled) { background: var(--accent2); transform: scale(1.06); }
+    #send-btn:disabled { opacity: .35; cursor: not-allowed; }
+    #hint { font-size: 11px; color: var(--text3); text-align: center; margin-top: 6px; }
+
+    /* ══ RIGHT: PREVIEW ══ */
+    #preview-panel { flex: 1; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; }
+    #preview-bar {
+      height: 52px; padding: 0 18px; border-bottom: 1px solid var(--border);
+      background: var(--surface); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .preview-title { font-size: 13px; font-weight: 600; color: var(--text2); display: flex; align-items: center; gap: 7px; }
+    .preview-indicator { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: all .3s; }
+    .preview-indicator.live { background: var(--green); box-shadow: 0 0 6px rgba(22,163,74,.5); }
+    #publish-btn {
+      display: none; align-items: center; gap: 6px;
+      padding: 7px 14px; background: var(--accent); border: none; border-radius: var(--radius-sm);
+      color: white; font-size: 13px; font-weight: 600; font-family: inherit;
+      cursor: pointer; text-decoration: none;
+      transition: all var(--transition); box-shadow: 0 3px 10px rgba(124,58,237,.3);
+    }
+    #publish-btn:hover { background: var(--accent2); transform: translateY(-1px); box-shadow: 0 5px 14px rgba(124,58,237,.4); }
+
+    #preview-content { flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+
+    /* Ghost placeholder */
+    #ghost-ph { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center; padding: 40px; }
+    #ghost-ph h3 { font-size: 17px; font-weight: 700; color: var(--text); }
+    #ghost-ph p { font-size: 13.5px; color: var(--text2); max-width: 280px; line-height: 1.65; }
+
+    /* Skeleton */
+    #skeleton { display: none; flex-direction: column; width: 100%; height: 100%; padding: 28px; gap: 14px; }
+    .skel { border-radius: 6px; background: linear-gradient(90deg,#ede9f8 25%,#f8f5ff 50%,#ede9f8 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+    @keyframes shimmer { 0%{background-position:200% center} 100%{background-position:-200% center} }
+    .sk-nav  { height: 44px; }
+    .sk-hero { height: 190px; }
+    .sk-row  { display: flex; gap: 10px; }
+    .sk-card { height: 110px; flex: 1; }
+    .sk-p    { height: 13px; }
+    .sk-p:nth-child(1) { width:75% }
+    .sk-p:nth-child(2) { width:55% }
+    .sk-p:nth-child(3) { width:65% }
+
+    /* Iframe */
+    #preview-iframe { display: none; width: 100%; height: 100%; border: none; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ── LEFT PANEL ── -->
+  <div id="chat-panel">
+    <div id="chat-header">
+      <!-- Logo ghost -->
+      <div class="logo-ghost-wrap">
+        <div class="css-ghost">
+          <div class="ghost-red">
+            <div class="g-top0"></div><div class="g-top1"></div><div class="g-top2"></div>
+            <div class="g-top3"></div><div class="g-top4"></div>
+            <div class="g-st0"></div><div class="g-st1"></div><div class="g-st2"></div>
+            <div class="g-st3"></div><div class="g-st4"></div><div class="g-st5"></div>
+            <div class="g-an1"></div><div class="g-an2"></div><div class="g-an3"></div>
+            <div class="g-an4"></div><div class="g-an5"></div><div class="g-an6"></div>
+            <div class="g-an7"></div><div class="g-an8"></div><div class="g-an9"></div>
+            <div class="g-an10"></div><div class="g-an11"></div><div class="g-an12"></div>
+            <div class="g-an13"></div><div class="g-an14"></div><div class="g-an15"></div>
+            <div class="g-an16"></div><div class="g-an17"></div><div class="g-an18"></div>
+          </div>
+          <div class="g-eye"></div>
+          <div class="g-eye1"></div>
+          <div class="g-pupil"></div>
+          <div class="g-pupil1"></div>
+        </div>
+      </div>
+      <span class="logo-text">Pixel</span>
+      <span class="logo-badge">Beta</span>
+    </div>
+
+    <div id="messages">
+      <div id="welcome">
+        <!-- Welcome ghost -->
+        <div id="ghost-wrap">
+          <div class="css-ghost">
+            <div class="ghost-red">
+              <div class="g-top0"></div><div class="g-top1"></div><div class="g-top2"></div>
+              <div class="g-top3"></div><div class="g-top4"></div>
+              <div class="g-st0"></div><div class="g-st1"></div><div class="g-st2"></div>
+              <div class="g-st3"></div><div class="g-st4"></div><div class="g-st5"></div>
+              <div class="g-an1"></div><div class="g-an2"></div><div class="g-an3"></div>
+              <div class="g-an4"></div><div class="g-an5"></div><div class="g-an6"></div>
+              <div class="g-an7"></div><div class="g-an8"></div><div class="g-an9"></div>
+              <div class="g-an10"></div><div class="g-an11"></div><div class="g-an12"></div>
+              <div class="g-an13"></div><div class="g-an14"></div><div class="g-an15"></div>
+              <div class="g-an16"></div><div class="g-an17"></div><div class="g-an18"></div>
+            </div>
+            <div class="g-eye"></div>
+            <div class="g-eye1"></div>
+            <div class="g-pupil"></div>
+            <div class="g-pupil1"></div>
+            <div class="g-shadow"></div>
+          </div>
+        </div>
+        <h2>Build something amazing</h2>
+        <p>Describe the app you want to create and Pixel will build and deploy it for you.</p>
+        <div class="chips">
+          <div class="chip" onclick="useSuggestion(this)">Task manager app</div>
+          <div class="chip" onclick="useSuggestion(this)">Recipe book with search</div>
+          <div class="chip" onclick="useSuggestion(this)">Expense tracker</div>
+          <div class="chip" onclick="useSuggestion(this)">Personal portfolio</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="file-pills"></div>
+    <div id="status-bar"><div class="status-dot"></div><span id="status-text">Building...</span></div>
+    <div id="build-log"><pre id="build-log-pre"></pre></div>
+
+    <div id="input-area">
+      <div id="input-box">
+        <textarea id="msg-input" placeholder="Describe the app you want to build..." rows="1"></textarea>
+        <button id="send-btn" onclick="sendMessage()" title="Send">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+      <div id="hint">Enter to send &middot; Shift+Enter for new line</div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT PANEL ── -->
+  <div id="preview-panel">
+    <div id="preview-bar">
+      <div class="preview-title">
+        <div class="preview-indicator" id="preview-dot"></div>
+        <span id="preview-label">Preview</span>
+      </div>
+      <a id="publish-btn" href="#" target="_blank" rel="noopener">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+          <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+        Open App
+      </a>
+    </div>
+
+    <div id="preview-content">
+      <!-- Ghost placeholder -->
+      <div id="ghost-ph">
+        <div class="css-ghost">
+          <div class="ghost-red">
+            <div class="g-top0"></div><div class="g-top1"></div><div class="g-top2"></div>
+            <div class="g-top3"></div><div class="g-top4"></div>
+            <div class="g-st0"></div><div class="g-st1"></div><div class="g-st2"></div>
+            <div class="g-st3"></div><div class="g-st4"></div><div class="g-st5"></div>
+            <div class="g-an1"></div><div class="g-an2"></div><div class="g-an3"></div>
+            <div class="g-an4"></div><div class="g-an5"></div><div class="g-an6"></div>
+            <div class="g-an7"></div><div class="g-an8"></div><div class="g-an9"></div>
+            <div class="g-an10"></div><div class="g-an11"></div><div class="g-an12"></div>
+            <div class="g-an13"></div><div class="g-an14"></div><div class="g-an15"></div>
+            <div class="g-an16"></div><div class="g-an17"></div><div class="g-an18"></div>
+          </div>
+          <div class="g-eye"></div>
+          <div class="g-eye1"></div>
+          <div class="g-pupil"></div>
+          <div class="g-pupil1"></div>
+          <div class="g-shadow"></div>
+        </div>
+        <h3>Your app will appear here</h3>
+        <p>Chat with Pixel to describe what you want to build. Once it's ready, the live app will load right here.</p>
+      </div>
+
+      <!-- Skeleton loader -->
+      <div id="skeleton">
+        <div class="skel sk-nav"></div>
+        <div class="skel sk-hero"></div>
+        <div class="sk-row">
+          <div class="skel sk-card"></div>
+          <div class="skel sk-card"></div>
+          <div class="skel sk-card"></div>
+        </div>
+        <div class="skel sk-p"></div>
+        <div class="skel sk-p"></div>
+        <div class="skel sk-p"></div>
+      </div>
+
+      <!-- Live iframe -->
+      <iframe id="preview-iframe" title="Live Preview" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+    </div>
+  </div>
+
+</div>
+<script>
+  const PORT = 3001;
+  const API_BASE = window.location.hostname === 'localhost'
+    ? `http://localhost:${PORT}`
+    : window.location.origin;
+
+  let history = [];
+  let ws = null;
+  let sessionId = null;
+  let deployUrl = null;
+  let isBuilding = false;
+
+  const messagesEl  = document.getElementById('messages');
+  const welcomeEl   = document.getElementById('welcome');
+  const inputEl     = document.getElementById('msg-input');
+  const sendBtn     = document.getElementById('send-btn');
+  const statusBar   = document.getElementById('status-bar');
+  const statusText  = document.getElementById('status-text');
+  const buildLog    = document.getElementById('build-log');
+  const buildLogPre = document.getElementById('build-log-pre');
+  const pillsEl     = document.getElementById('file-pills');
+  const publishBtn  = document.getElementById('publish-btn');
+  const previewDot  = document.getElementById('preview-dot');
+  const previewLbl  = document.getElementById('preview-label');
+  const ghostPh     = document.getElementById('ghost-ph');
+  const skeletonEl  = document.getElementById('skeleton');
+  const iframeEl    = document.getElementById('preview-iframe');
+
+  // Auto-resize textarea
+  inputEl.addEventListener('input', () => {
+    inputEl.style.height = 'auto';
+    inputEl.style.height = Math.min(inputEl.scrollHeight, 130) + 'px';
+  });
+  inputEl.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  function useSuggestion(el) {
+    inputEl.value = el.textContent;
+    inputEl.dispatchEvent(new Event('input'));
+    inputEl.focus();
+  }
+
+  function hideWelcome() { if (welcomeEl) welcomeEl.style.display = 'none'; }
+
+  function addMsg(role, text, cls = '') {
+    hideWelcome();
+    const w = document.createElement('div');
+    w.className = `msg ${role}`;
+    const lbl = document.createElement('div');
+    lbl.className = 'msg-label';
+    lbl.textContent = role === 'user' ? 'You' : 'Pixel';
+    const b = document.createElement('div');
+    b.className = `msg-bubble ${cls}`;
+    b.textContent = text;
+    w.append(lbl, b);
+    messagesEl.appendChild(w);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return b;
+  }
+
+  function addMsgHTML(role, html, cls = '') {
+    hideWelcome();
+    const w = document.createElement('div');
+    w.className = `msg ${role}`;
+    const lbl = document.createElement('div');
+    lbl.className = 'msg-label';
+    lbl.textContent = role === 'user' ? 'You' : 'Pixel';
+    const b = document.createElement('div');
+    b.className = `msg-bubble ${cls}`;
+    b.innerHTML = html;
+    w.append(lbl, b);
+    messagesEl.appendChild(w);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function showTyping() {
+    hideWelcome();
+    const w = document.createElement('div');
+    w.className = 'msg agent'; w.id = 'typing';
+    const lbl = document.createElement('div');
+    lbl.className = 'msg-label'; lbl.textContent = 'Pixel';
+    const dots = document.createElement('div');
+    dots.className = 'typing-wrap';
+    dots.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+    w.append(lbl, dots);
+    messagesEl.appendChild(w);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+  function hideTyping() { const el = document.getElementById('typing'); if (el) el.remove(); }
+
+  function setStatus(text, show = true) {
+    statusBar.style.display = show ? 'flex' : 'none';
+    statusText.textContent = text;
+  }
+
+  function addPill(file) {
+    const p = document.createElement('div');
+    p.className = 'pill'; p.textContent = file;
+    pillsEl.appendChild(p);
+  }
+
+  function appendLog(text) {
+    buildLog.style.display = 'block';
+    buildLogPre.textContent += text;
+    buildLog.scrollTop = buildLog.scrollHeight;
+  }
+
+  function showSkeleton() {
+    ghostPh.style.display = 'none';
+    iframeEl.style.display = 'none';
+    skeletonEl.style.display = 'flex';
+    previewLbl.textContent = 'Building...';
+    previewDot.classList.remove('live');
+  }
+
+  function showGhost() {
+    skeletonEl.style.display = 'none';
+    iframeEl.style.display = 'none';
+    ghostPh.style.display = 'flex';
+    previewLbl.textContent = 'Preview';
+    previewDot.classList.remove('live');
+  }
+
+  function showIframe(url) {
+    ghostPh.style.display = 'none';
+    skeletonEl.style.display = 'none';
+    iframeEl.style.display = 'block';
+    iframeEl.src = url;
+    previewLbl.textContent = 'Live';
+    previewDot.classList.add('live');
+  }
+
+  // ── Send message ──
+  async function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text || isBuilding) return;
+
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    sendBtn.disabled = true;
+
+    history.push({ role: 'user', content: text });
+    addMsg('user', text);
+    showTyping();
+
+    try {
+      const res = await fetch(`${API_BASE}/api/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history }),
+      });
+      if (!res.ok) throw new Error(`Server error ${res.status}`);
+      const data = await res.json();
+      hideTyping();
+      history.push({ role: 'assistant', content: data.response });
+
+      if (data.ready) {
+        const planText = data.response.replace(/READY_TO_BUILD/g, '').trim();
+        addMsg('agent', planText.length > 400 ? planText.slice(0, 400) + '…' : planText);
+        setTimeout(() => startBuild(data.response), 400);
+      } else {
+        addMsg('agent', data.response);
+        sendBtn.disabled = false;
+        inputEl.focus();
+      }
+    } catch (err) {
+      hideTyping();
+      addMsg('agent', `Error: ${err.message}`, 'error');
+      history.pop();
+      sendBtn.disabled = false;
+      inputEl.focus();
+    }
+  }
+
+  // ── Start build ──
+  async function startBuild(plan) {
+    isBuilding = true;
+    showSkeleton();
+    setStatus('Starting build pipeline...');
+    buildLog.style.display = 'block';
+    addMsg('agent', '🚀 Build pipeline started! I\'ll keep you updated as your app is created and deployed.');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/build`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      });
+      if (!res.ok) throw new Error(`Build start failed: ${res.status}`);
+      const data = await res.json();
+      sessionId = data.sessionId;
+      connectWS(sessionId);
+    } catch (err) {
+      setStatus('', false);
+      showGhost();
+      addMsg('agent', `Failed to start build: ${err.message}`, 'error');
+      isBuilding = false;
+      sendBtn.disabled = false;
+      inputEl.focus();
+    }
+  }
+
+  // ── WebSocket ──
+  function connectWS(sid) {
+    const wsUrl = API_BASE.replace(/^http/, 'ws') + '/ws';
+    ws = new WebSocket(wsUrl);
+
+    ws.onopen = () => ws.send(JSON.stringify({ type: 'subscribe', sessionId: sid }));
+
+    ws.onmessage = e => {
+      try { handleEvent(JSON.parse(e.data)); } catch {}
+    };
+
+    ws.onclose = () => {
+      if (isBuilding && !deployUrl) setTimeout(() => pollSession(sid), 2000);
+    };
+
+    ws.onerror = () => setStatus('Connection error', false);
+  }
+
+  async function pollSession(sid) {
+    try {
+      const res = await fetch(`${API_BASE}/api/session/${sid}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      data.events.forEach(handleEvent);
+    } catch {}
+  }
+
+  function handleEvent(ev) {
+    switch (ev.type) {
+      case 'agent_start':
+        setStatus(`${cap(ev.agent)} agent running...`);
+        addMsg('agent', `⚙️ ${cap(ev.agent)} agent started`);
+        break;
+      case 'agent_log':
+        appendLog(ev.text);
+        break;
+      case 'file_written':
+        addPill(ev.file);
+        break;
+      case 'agent_complete':
+        if (ev.success) addMsg('agent', `✅ ${cap(ev.agent)} finished`);
+        else addMsg('agent', `⚠️ ${cap(ev.agent)} hit issues — running debugger...`);
+        break;
+      case 'pipeline_complete':
+        deployUrl = ev.deployUrl;
+        isBuilding = false;
+        setStatus('', false);
+        showIframe(deployUrl);
+        publishBtn.href = deployUrl;
+        publishBtn.style.display = 'flex';
+        addMsgHTML('agent',
+          `🎉 Your app is live! <a href="${deployUrl}" target="_blank" style="color:var(--accent);text-decoration:underline">${deployUrl}</a>`,
+          'success'
+        );
+        sendBtn.disabled = false;
+        inputEl.placeholder = 'Ask Pixel to modify your app...';
+        inputEl.focus();
+        break;
+      case 'pipeline_error':
+        isBuilding = false;
+        setStatus('', false);
+        showGhost();
+        addMsg('agent', `❌ Build failed: ${ev.error}`, 'error');
+        sendBtn.disabled = false;
+        inputEl.focus();
+        break;
+    }
+  }
+
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+</script>
+</body>
+</html>
