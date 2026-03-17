@@ -25,10 +25,13 @@ const nextConfig = {
 module.exports = nextConfig;
 
 CRITICAL RULES for static export compatibility:
-1. Never use dynamic routes like [id] — use query params (?id=123) with useSearchParams() instead. Static export cannot handle dynamic routes without generateStaticParams(), and since all data is in localStorage there are no known IDs at build time.
-2. Never use getServerSideProps or API routes.
-3. All data must come from localStorage or be hardcoded.
-4. Always use 'use client' at the top of any component that uses useState, useEffect, useSearchParams, or any browser API.`;
+1. NEVER create any folder or file with square brackets like [id], [slug], [anything]. This is strictly forbidden. If you need to edit or view a specific item, use query params instead:
+   - WRONG: /expenses/[id]/edit/page.tsx
+   - RIGHT: /expenses/edit/page.tsx and read the id with useSearchParams()
+2. Every page that reads query params must have 'use client' at the top and use useSearchParams() wrapped in a Suspense boundary.
+3. Never use getServerSideProps or API routes.
+4. All data must come from localStorage or be hardcoded.
+5. Always use 'use client' at the top of any component that uses useState, useEffect, useSearchParams, or any browser API.`;
 
 function parseFiles(text) {
   const files = [];
@@ -87,6 +90,15 @@ export async function coderAgent(plan, workDir, emit) {
 
     if (files.length === 0) {
       throw new Error('No files were parsed from coder response');
+    }
+
+    // Safety check: abort if any dynamic routes were generated
+    const allFiles = [...writtenFiles];
+    const dynamicRoutes = allFiles.filter(f => f.includes('['));
+    if (dynamicRoutes.length > 0) {
+      const error = `Dynamic routes detected (not allowed with static export): ${dynamicRoutes.join(', ')}`;
+      emit({ type: 'agent_complete', agent: 'cipher', success: false, error });
+      return { success: false, buildOutput: '', error };
     }
 
     // Run npm install
