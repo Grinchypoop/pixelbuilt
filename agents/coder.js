@@ -22,7 +22,13 @@ const nextConfig = {
   trailingSlash: true,
   images: { unoptimized: true },
 };
-module.exports = nextConfig;`;
+module.exports = nextConfig;
+
+CRITICAL RULES for static export compatibility:
+1. Never use dynamic routes like [id] — use query params (?id=123) with useSearchParams() instead. Static export cannot handle dynamic routes without generateStaticParams(), and since all data is in localStorage there are no known IDs at build time.
+2. Never use getServerSideProps or API routes.
+3. All data must come from localStorage or be hardcoded.
+4. Always use 'use client' at the top of any component that uses useState, useEffect, useSearchParams, or any browser API.`;
 
 function parseFiles(text) {
   const files = [];
