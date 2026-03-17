@@ -32,7 +32,7 @@ export async function plannerChat(messages, emit) {
       ) {
         const text = chunk.delta.text;
         fullResponse += text;
-        emit({ type: 'agent_thinking', agent: 'planner', text });
+        emit({ type: 'agent_thinking', agent: 'ghost', text });
       }
     }
 

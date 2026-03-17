@@ -49,7 +49,7 @@ async function pushToGitHub(files, repoName, githubToken, emit) {
   };
 
   // Create repo under the org/user
-  emit({ type: 'agent_log', agent: 'deployer', text: `Creating GitHub repo ${GITHUB_ORG}/${repoName}...\n` });
+  emit({ type: 'agent_log', agent: 'shadow', text: `Creating GitHub repo ${GITHUB_ORG}/${repoName}...\n` });
   const createRes = await fetch(`${GITHUB_API}/orgs/${GITHUB_ORG}/repos`, {
     method: 'POST',
     headers,
@@ -69,7 +69,7 @@ async function pushToGitHub(files, repoName, githubToken, emit) {
     }
   }
 
-  emit({ type: 'agent_log', agent: 'deployer', text: `Pushing ${files.length} files to GitHub...\n` });
+  emit({ type: 'agent_log', agent: 'shadow', text: `Pushing ${files.length} files to GitHub...\n` });
 
   // Create blobs for each file
   const treeItems = [];
@@ -109,7 +109,7 @@ async function pushToGitHub(files, repoName, githubToken, emit) {
     body: JSON.stringify({ ref: 'refs/heads/main', sha: commit.sha }),
   });
 
-  emit({ type: 'agent_log', agent: 'deployer', text: `GitHub: https://github.com/${GITHUB_ORG}/${repoName}\n` });
+  emit({ type: 'agent_log', agent: 'shadow', text: `GitHub: https://github.com/${GITHUB_ORG}/${repoName}\n` });
   return `https://github.com/${GITHUB_ORG}/${repoName}`;
 }
 
@@ -131,7 +131,7 @@ async function pollDeployment(deploymentId, token, emit) {
     }
 
     const data = await res.json();
-    emit({ type: 'agent_log', agent: 'deployer', text: `Deployment status: ${data.readyState} (attempt ${attempt})\n` });
+    emit({ type: 'agent_log', agent: 'shadow', text: `Deployment status: ${data.readyState} (attempt ${attempt})\n` });
 
     if (data.readyState === 'READY') {
       return `https://${data.url}`;
@@ -144,13 +144,13 @@ async function pollDeployment(deploymentId, token, emit) {
 }
 
 export async function deployerAgent(workDir, sessionId, subdomain, emit) {
-  emit({ type: 'agent_start', agent: 'deployer' });
+  emit({ type: 'agent_start', agent: 'shadow' });
 
   const vercelToken = process.env.VERCEL_TOKEN;
   const githubToken = process.env.GITHUB_TOKEN;
 
   try {
-    emit({ type: 'agent_log', agent: 'deployer', text: 'Reading project files...\n' });
+    emit({ type: 'agent_log', agent: 'shadow', text: 'Reading project files...\n' });
     const files = await readAllFilesForDeploy(workDir);
     const projectName = `pixel-app-${sessionId.slice(0, 8)}`;
 
@@ -159,20 +159,20 @@ export async function deployerAgent(workDir, sessionId, subdomain, emit) {
       try {
         await pushToGitHub(files, projectName, githubToken, emit);
       } catch (ghErr) {
-        emit({ type: 'agent_log', agent: 'deployer', text: `GitHub push failed (continuing): ${ghErr.message}\n` });
+        emit({ type: 'agent_log', agent: 'shadow', text: `GitHub push failed (continuing): ${ghErr.message}\n` });
       }
     } else {
-      emit({ type: 'agent_log', agent: 'deployer', text: 'No GITHUB_TOKEN set, skipping GitHub push.\n' });
+      emit({ type: 'agent_log', agent: 'shadow', text: 'No GITHUB_TOKEN set, skipping GitHub push.\n' });
     }
 
     // Deploy to Vercel
     if (!vercelToken) {
-      emit({ type: 'agent_log', agent: 'deployer', text: 'No VERCEL_TOKEN set. Skipping deployment.\n' });
+      emit({ type: 'agent_log', agent: 'shadow', text: 'No VERCEL_TOKEN set. Skipping deployment.\n' });
       emit({ type: 'pipeline_error', error: 'VERCEL_TOKEN not configured. Set it in your .env file to enable deployment.' });
       return { success: false, error: 'VERCEL_TOKEN not set' };
     }
 
-    emit({ type: 'agent_log', agent: 'deployer', text: `Uploading ${files.length} files to Vercel...\n` });
+    emit({ type: 'agent_log', agent: 'shadow', text: `Uploading ${files.length} files to Vercel...\n` });
 
     const deployRes = await fetch(`${VERCEL_API}/v13/deployments`, {
       method: 'POST',
@@ -194,16 +194,16 @@ export async function deployerAgent(workDir, sessionId, subdomain, emit) {
     }
 
     const deployData = await deployRes.json();
-    emit({ type: 'agent_log', agent: 'deployer', text: `Deployment created: ${deployData.id}\nPolling for ready state...\n` });
+    emit({ type: 'agent_log', agent: 'shadow', text: `Deployment created: ${deployData.id}\nPolling for ready state...\n` });
 
     const deployUrl = await pollDeployment(deployData.id, vercelToken, emit);
-    emit({ type: 'agent_log', agent: 'deployer', text: `Deployed successfully: ${deployUrl}\n` });
+    emit({ type: 'agent_log', agent: 'shadow', text: `Deployed successfully: ${deployUrl}\n` });
 
     // Add custom domain alias if subdomain was provided
     let finalUrl = deployUrl;
     if (subdomain) {
       const alias = `${subdomain}.stackplus.sg`;
-      emit({ type: 'agent_log', agent: 'deployer', text: `Adding custom domain: ${alias}\n` });
+      emit({ type: 'agent_log', agent: 'shadow', text: `Adding custom domain: ${alias}\n` });
       const aliasRes = await fetch(`${VERCEL_API}/v2/deployments/${deployData.id}/aliases`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${vercelToken}`, 'Content-Type': 'application/json' },
@@ -211,10 +211,10 @@ export async function deployerAgent(workDir, sessionId, subdomain, emit) {
       });
       if (aliasRes.ok) {
         finalUrl = `https://${alias}`;
-        emit({ type: 'agent_log', agent: 'deployer', text: `Custom domain set: ${finalUrl}\n` });
+        emit({ type: 'agent_log', agent: 'shadow', text: `Custom domain set: ${finalUrl}\n` });
       } else {
         const aliasErr = await aliasRes.text();
-        emit({ type: 'agent_log', agent: 'deployer', text: `Custom domain failed (using Vercel URL): ${aliasErr}\n` });
+        emit({ type: 'agent_log', agent: 'shadow', text: `Custom domain failed (using Vercel URL): ${aliasErr}\n` });
       }
     }
 
@@ -223,7 +223,7 @@ export async function deployerAgent(workDir, sessionId, subdomain, emit) {
     return { success: true, deployUrl };
   } catch (err) {
     console.error('Deployer error:', err);
-    emit({ type: 'agent_log', agent: 'deployer', text: `Deployment error: ${err.message}\n` });
+    emit({ type: 'agent_log', agent: 'shadow', text: `Deployment error: ${err.message}\n` });
     emit({ type: 'pipeline_error', error: err.message });
     return { success: false, error: err.message };
   }

@@ -13,7 +13,7 @@ export async function runPipeline(plan, sessionId, emit) {
 
   // Create working directory
   fs.mkdirSync(workDir, { recursive: true });
-  emit({ type: 'agent_log', agent: 'orchestrator', text: `Working directory: ${workDir}\n` });
+  emit({ type: 'agent_log', agent: 'command', text: `Working directory: ${workDir}\n` });
 
   let coderResult = await coderAgent(plan, workDir, emit);
 
@@ -26,7 +26,7 @@ export async function runPipeline(plan, sessionId, emit) {
       debugAttempt++;
       emit({
         type: 'agent_log',
-        agent: 'orchestrator',
+        agent: 'command',
         text: `\nDebug attempt ${debugAttempt}/${MAX_DEBUG_RETRIES}...\n`,
       });
 
@@ -37,7 +37,7 @@ export async function runPipeline(plan, sessionId, emit) {
       const { promisify } = await import('util');
       const execAsync = promisify(exec);
 
-      emit({ type: 'agent_log', agent: 'orchestrator', text: '\nRetrying npm run build...\n' });
+      emit({ type: 'agent_log', agent: 'command', text: '\nRetrying npm run build...\n' });
 
       try {
         const { stdout, stderr } = await execAsync('npm run build', {
@@ -45,13 +45,13 @@ export async function runPipeline(plan, sessionId, emit) {
           timeout: 180000,
         });
         const buildOutput = stdout + '\n' + stderr;
-        emit({ type: 'agent_log', agent: 'orchestrator', text: buildOutput });
+        emit({ type: 'agent_log', agent: 'command', text: buildOutput });
         fixed = true;
         coderResult = { success: true, buildOutput };
       } catch (buildErr) {
         const buildOutput =
           (buildErr.stdout || '') + '\n' + (buildErr.stderr || '') + '\n' + buildErr.message;
-        emit({ type: 'agent_log', agent: 'orchestrator', text: `Build still failing:\n${buildOutput}\n` });
+        emit({ type: 'agent_log', agent: 'command', text: `Build still failing:\n${buildOutput}\n` });
         coderResult = { success: false, buildOutput, error: buildOutput };
       }
     }

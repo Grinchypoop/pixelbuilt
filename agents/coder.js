@@ -43,7 +43,7 @@ function parseFiles(text) {
 }
 
 export async function coderAgent(plan, workDir, emit) {
-  emit({ type: 'agent_start', agent: 'coder' });
+  emit({ type: 'agent_start', agent: 'cipher' });
 
   let fullResponse = '';
   const writtenFiles = new Set();
@@ -67,13 +67,13 @@ export async function coderAgent(plan, workDir, emit) {
         chunk.delta.type === 'text_delta'
       ) {
         fullResponse += chunk.delta.text;
-        emit({ type: 'agent_log', agent: 'coder', text: chunk.delta.text });
+        emit({ type: 'agent_log', agent: 'cipher', text: chunk.delta.text });
       }
     }
 
     // Parse and write files
     const files = parseFiles(fullResponse);
-    emit({ type: 'agent_log', agent: 'coder', text: `\nParsed ${files.length} files from response.\n` });
+    emit({ type: 'agent_log', agent: 'cipher', text: `\nParsed ${files.length} files from response.\n` });
 
     for (const file of files) {
       const filePath = path.join(workDir, file.path);
@@ -83,7 +83,7 @@ export async function coderAgent(plan, workDir, emit) {
 
       if (!writtenFiles.has(file.path)) {
         writtenFiles.add(file.path);
-        emit({ type: 'file_written', agent: 'coder', file: file.path });
+        emit({ type: 'file_written', agent: 'cipher', file: file.path });
       }
     }
 
@@ -92,20 +92,20 @@ export async function coderAgent(plan, workDir, emit) {
     }
 
     // Run npm install
-    emit({ type: 'agent_log', agent: 'coder', text: '\nRunning npm install...\n' });
+    emit({ type: 'agent_log', agent: 'cipher', text: '\nRunning npm install...\n' });
     try {
       const { stdout: installOut, stderr: installErr } = await execAsync('npm install', {
         cwd: workDir,
         timeout: 120000,
       });
-      emit({ type: 'agent_log', agent: 'coder', text: installOut || installErr || 'npm install complete.\n' });
+      emit({ type: 'agent_log', agent: 'cipher', text: installOut || installErr || 'npm install complete.\n' });
     } catch (installErr) {
-      emit({ type: 'agent_log', agent: 'coder', text: `npm install error: ${installErr.message}\n` });
+      emit({ type: 'agent_log', agent: 'cipher', text: `npm install error: ${installErr.message}\n` });
       throw installErr;
     }
 
     // Run npm run build
-    emit({ type: 'agent_log', agent: 'coder', text: '\nRunning npm run build...\n' });
+    emit({ type: 'agent_log', agent: 'cipher', text: '\nRunning npm run build...\n' });
     let buildOutput = '';
     try {
       const { stdout, stderr } = await execAsync('npm run build', {
@@ -113,19 +113,19 @@ export async function coderAgent(plan, workDir, emit) {
         timeout: 180000,
       });
       buildOutput = stdout + '\n' + stderr;
-      emit({ type: 'agent_log', agent: 'coder', text: buildOutput });
+      emit({ type: 'agent_log', agent: 'cipher', text: buildOutput });
     } catch (buildErr) {
       buildOutput = buildErr.stdout + '\n' + buildErr.stderr + '\n' + buildErr.message;
-      emit({ type: 'agent_log', agent: 'coder', text: `Build failed:\n${buildOutput}\n` });
-      emit({ type: 'agent_complete', agent: 'coder', success: false, error: buildOutput });
+      emit({ type: 'agent_log', agent: 'cipher', text: `Build failed:\n${buildOutput}\n` });
+      emit({ type: 'agent_complete', agent: 'cipher', success: false, error: buildOutput });
       return { success: false, buildOutput, error: buildOutput };
     }
 
-    emit({ type: 'agent_complete', agent: 'coder', success: true });
+    emit({ type: 'agent_complete', agent: 'cipher', success: true });
     return { success: true, buildOutput };
   } catch (err) {
     console.error('Coder agent error:', err);
-    emit({ type: 'agent_complete', agent: 'coder', success: false, error: err.message });
+    emit({ type: 'agent_complete', agent: 'cipher', success: false, error: err.message });
     return { success: false, buildOutput: '', error: err.message };
   }
 }
