@@ -208,14 +208,13 @@
     .dot:nth-child(3) { animation-delay: .3s; }
     @keyframes bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
 
-    /* File pills */
-    #file-pills { padding: 0 16px 6px; display: flex; flex-wrap: wrap; gap: 5px; }
-    .pill {
-      font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 100px;
+    /* File counter */
+    #file-pills { padding: 0 16px 6px; }
+    #file-counter {
+      display: none; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 100px;
       background: var(--accent-glow); border: 1px solid rgba(124,58,237,.2); color: var(--accent);
-      animation: popIn .15s ease;
+      width: fit-content;
     }
-    @keyframes popIn { from{opacity:0;transform:scale(.8)} to{opacity:1;transform:none} }
 
     /* Build log */
     #build-log {
@@ -368,7 +367,7 @@
       </div>
     </div>
 
-    <div id="file-pills"></div>
+    <div id="file-pills"><div id="file-counter"></div></div>
     <div id="status-bar"><div class="status-dot"></div><span id="status-text">Building...</span></div>
     <div id="build-log"><pre id="build-log-pre"></pre></div>
 
@@ -468,6 +467,8 @@
   const buildLog    = document.getElementById('build-log');
   const buildLogPre = document.getElementById('build-log-pre');
   const pillsEl     = document.getElementById('file-pills');
+  const fileCounter = document.getElementById('file-counter');
+  let fileCount = 0;
   const publishBtn  = document.getElementById('publish-btn');
   const previewDot  = document.getElementById('preview-dot');
   const previewLbl  = document.getElementById('preview-label');
@@ -548,9 +549,9 @@
   }
 
   function addPill(file) {
-    const p = document.createElement('div');
-    p.className = 'pill'; p.textContent = file;
-    pillsEl.appendChild(p);
+    fileCount++;
+    fileCounter.style.display = 'block';
+    fileCounter.textContent = `📄 ${fileCount} file${fileCount === 1 ? '' : 's'} written`;
   }
 
   function appendLog(text) {
@@ -633,6 +634,8 @@
   // ── Start build ──
   async function startBuild(plan) {
     isBuilding = true;
+    fileCount = 0;
+    fileCounter.style.display = 'none';
     // Transition from planning (full-width) to split layout
     document.getElementById('app').classList.remove('planning');
     showSkeleton();
